@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 运行/测试环境（本仓库只保留插件本体）
+AstrBot/
+data/
+tests/
+
+# 构建产物
+*.zip
+
+# IDE / 系统
+.idea/
+.vscode/
+.DS_Store
+
+# 临时文件
+gh_out.txt
+gh_err.txt
+gh_pid.txt
+repo_files.json
+ex_metadata.yaml
+ex_README.md
