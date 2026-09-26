@@ -1,0 +1,62 @@
+{
+  "enabled": {
+    "description": "是否启用入群欢迎",
+    "type": "bool",
+    "default": true
+  },
+  "global_welcome": {
+    "description": "全局默认欢迎语。当某个群没有单独设置欢迎语时使用。支持占位符：{at} AT新人，{name} 新人昵称，{group} 群号",
+    "type": "text",
+    "default": "欢迎 {at} 加入本群！"
+  },
+  "global_image": {
+    "description": "全局默认欢迎图片（可选）。填图片 URL 或本地路径，留空不发送图片。当某个群没有单独设置图片时使用",
+    "type": "string",
+    "default": ""
+  },
+  "group_welcomes": {
+    "description": "每群单独欢迎语，点击添加条目为每个群配置。设置后优先于全局欢迎语",
+    "type": "template_list",
+    "default": [],
+    "templates": {
+      "group_welcome": {
+        "name": "群欢迎语",
+        "hint": "为指定群单独配置欢迎语",
+        "items": {
+          "group_id": {
+            "description": "群号",
+            "type": "string",
+            "hint": "要单独设置欢迎语的群号"
+          },
+          "welcome": {
+            "description": "欢迎语",
+            "type": "text",
+            "hint": "支持占位符：{at} AT新人，{name} 新人昵称，{group} 群号"
+          },
+          "image": {
+            "description": "欢迎图片（可选）",
+            "type": "string",
+            "hint": "填图片 URL 或本地路径，留空不发送图片。留空时使用全局默认图片"
+          }
+        }
+      }
+    }
+  },
+  "list_mode": {
+    "description": "名单模式：黑名单模式（名单内的群不欢迎），白名单模式（仅名单内的群欢迎）",
+    "type": "string",
+    "default": "blacklist",
+    "options": ["blacklist", "whitelist"],
+    "labels": ["黑名单模式", "白名单模式"]
+  },
+  "blacklist": {
+    "description": "群黑名单（黑名单模式下生效），填群号",
+    "type": "list",
+    "default": []
+  },
+  "whitelist": {
+    "description": "群白名单（白名单模式下生效），填群号",
+    "type": "list",
+    "default": []
+  }
+}
