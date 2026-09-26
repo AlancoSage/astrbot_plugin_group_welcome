@@ -1,57 +1,57 @@
-[中文](README_zh.md) | English
+中文 | [English](README_en.md)
 
-# Group Welcome (astrbot_plugin_group_welcome)
+# 入群欢迎（astrbot_plugin_group_welcome）
 
-Automatically sends a welcome message when a new member joins a group. Supports a global default welcome message, per-group welcome text and images, and group allowlist/denylist filtering.
+检测新人入群后自动发送欢迎消息，支持全局默认欢迎语、每群单独配置欢迎语与图片、群黑白名单过滤。
 
-## Features
+## 功能特性
 
-- Automatically detects OneBot v11 (aiocqhttp) `group_increase` notice events.
-- Three-layer welcome message resolution: per-group config → global default → skip.
-- Per-group welcome messages support an attached image (URL or local path); image-only welcomes are also supported.
-- Placeholders:
-  - `{at}`: mention the new member (At segment, aiocqhttp only)
-  - `{name}`: nickname of the new member
-  - `{group}`: group ID
-- Group allowlist/denylist filtering: denylist mode (groups in the list are skipped) or allowlist mode (only listed groups are welcomed), selected via a dropdown in the WebUI.
-- Admin commands: set/view/delete the current group's welcome text and image directly in group chat; synced with the WebUI config.
-- Per-group welcomes are managed as cards (template_list) in the WebUI: add, expand-edit, and delete per group.
-- A failure to send a single welcome message does not affect the plugin; the error is logged.
+- 自动识别 OneBot v11（aiocqhttp）的 `group_increase` 入群通知事件。
+- 三层欢迎语配置：每群单独配置 → 全局默认欢迎语 → 不发送。
+- 每群欢迎语支持附加图片（URL 或本地路径），无文本时也可单独发图。
+- 占位符：
+  - `{at}`：AT 新入群成员（At 消息段，仅 aiocqhttp 平台支持）
+  - `{name}`：新成员昵称
+  - `{group}`：群号
+- 群黑白名单过滤：黑名单模式（名单内的群不欢迎）或白名单模式（仅名单内的群欢迎），在 WebUI 中以下拉框选择。
+- 管理指令（仅管理员）：在群聊中直接设置/查看/删除当前群的欢迎语和图片，与 WebUI 配置互通。
+- 每群欢迎语在 WebUI 中以卡片（template_list）形式逐群添加、展开编辑、单独删除。
+- 单条欢迎发送失败不影响插件运行，失败原因会记录到日志。
 
-## Trigger rules
+## 触发规则
 
-The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to `group_increase`. Other platform adapters do not provide this event type and will not trigger it.
+插件仅在收到 OneBot v11 的 `notice` 事件且 `notice_type` 为 `group_increase` 时触发；其他平台适配器暂不提供此类事件，不会误触发。
 
-## Quick start
+## 快速开始
 
-1. Install the plugin into AstrBot's plugin directory and reload (or upload the zip in the WebUI).
-2. Configure as needed in the plugin settings:
-   - `global_welcome`: global default welcome message
-   - `global_image`: global default welcome image (optional)
-3. To restrict where it applies, configure `list_mode` + `blacklist` / `whitelist`.
-4. To customize a specific group, click "Add entry" under the per-group list and fill in the group ID, welcome message, and image.
+1. 安装插件到 AstrBot 插件目录并重载（或在 WebUI 上传 zip 安装）。
+2. 在插件配置中按需填写：
+   - `global_welcome`：全局默认欢迎语
+   - `global_image`：全局默认欢迎图片（可选）
+3. 如需限制生效范围，配置 `list_mode` + `blacklist` / `whitelist`。
+4. 如需为某个群单独定制，在「每群单独欢迎语」中点击「添加条目」，填写群号、欢迎语和图片。
 
-## Configuration
+## 配置说明（重点）
 
-| Option | Type | Default | Description |
+| 配置项 | 类型 | 默认值 | 说明 |
 |---|---|---|---|
-| `enabled` | `bool` | `true` | Enable the welcome feature |
-| `global_welcome` | `text` | `Welcome {at}!` | Global default welcome message, used when a group has no per-group config. Placeholders supported |
-| `global_image` | `string` | `""` | Global default welcome image (URL or local path). Empty means no image |
-| `list_mode` | `string` | `blacklist` | List mode: `blacklist` / `whitelist` (dropdown in the WebUI) |
-| `blacklist` | `list[string]` | `[]` | Group denylist, effective in blacklist mode. Group IDs |
-| `whitelist` | `list[string]` | `[]` | Group allowlist, effective in whitelist mode. Group IDs |
-| `group_welcomes` | `template_list` | `[]` | Per-group welcome cards, each with group ID, welcome message, and image |
+| `enabled` | `bool` | `true` | 是否启用入群欢迎 |
+| `global_welcome` | `text` | `欢迎 {at} 加入本群！` | 全局默认欢迎语，群未单独设置时使用，支持占位符 |
+| `global_image` | `string` | `""` | 全局默认欢迎图片（URL 或本地路径），留空不发送图片 |
+| `list_mode` | `string` | `blacklist` | 名单模式：`blacklist` 黑名单模式 / `whitelist` 白名单模式（WebUI 下拉选择） |
+| `blacklist` | `list[string]` | `[]` | 群黑名单，黑名单模式下生效，填群号 |
+| `whitelist` | `list[string]` | `[]` | 群白名单，白名单模式下生效，填群号 |
+| `group_welcomes` | `template_list` | `[]` | 每群单独欢迎语卡片，每条含群号、欢迎语、图片 |
 
-### `group_welcomes` entry fields
+### `group_welcomes` 条目字段
 
-| Field | Type | Description |
+| 字段 | 类型 | 说明 |
 |---|---|---|
-| `group_id` | `string` | Group ID to customize |
-| `welcome` | `text` | Welcome message for this group. Placeholders supported. Falls back to the global message when empty |
-| `image` | `string` | Welcome image for this group (URL or local path). Falls back to the global image when empty |
+| `group_id` | `string` | 要单独设置欢迎语的群号 |
+| `welcome` | `text` | 该群欢迎语，支持占位符；留空时回退全局欢迎语 |
+| `image` | `string` | 该群欢迎图片（URL 或本地路径）；留空时回退全局图片 |
 
-Example (equivalent to adding one card in the WebUI):
+配置示例（等价于在 WebUI 中添加一条卡片）：
 
 ```json
 {
@@ -59,37 +59,37 @@ Example (equivalent to adding one card in the WebUI):
     {
       "__template_key": "group_welcome",
       "group_id": "123456789",
-      "welcome": "Welcome {at} to group {group}!",
+      "welcome": "欢迎 {at} 加入 {group} 群！",
       "image": "https://example.com/welcome.png"
     }
   ]
 }
 ```
 
-## Commands (admin only)
+## 指令说明（仅管理员）
 
-| Command | Description |
+| 指令 | 说明 |
 |---|---|
-| `/欢迎设置 <message>` | Set the welcome message for the current group |
-| `/欢迎图片 <URL or path>` | Set the welcome image for the current group; pass "无 / 清除 / 删除" to clear it |
-| `/欢迎查看` | Show the current group's welcome message and image |
-| `/欢迎删除` | Delete the current group's config and fall back to the global default |
+| `/欢迎设置 <欢迎语>` | 为当前群设置欢迎语 |
+| `/欢迎图片 <URL或路径>` | 为当前群设置欢迎图片，参数填「无 / 清除 / 删除」则清除 |
+| `/欢迎查看` | 查看当前群的欢迎语和图片配置 |
+| `/欢迎删除` | 删除当前群配置，恢复使用全局默认 |
 
-## Output
+## 返回内容
 
-When a new member joins, the plugin sends one welcome message containing:
+检测到新人入群后发送一条欢迎消息，依次包含：
 
-1. The welcome text (placeholders replaced, `{at}` rendered as an At segment)
-2. The welcome image (if configured)
+1. 欢迎语文本（占位符已替换，`{at}` 为 At 消息段）
+2. 欢迎图片（如已配置）
 
-## FAQ
+## 常见问题
 
-- No welcome message received
-  - Make sure you are using the aiocqhttp (OneBot v11) platform adapter; other adapters do not deliver join-notice events.
-  - Make sure `enabled` is on and the group is not filtered by the denylist (or is in the allowlist).
+- 收不到欢迎消息
+  - 确认使用的是 aiocqhttp（OneBot v11）平台适配器，其他平台不下发入群通知事件。
+  - 确认 `enabled` 已开启，且该群未被黑名单过滤（或已在白名单中）。
 
-- Welcome image not displayed
-  - Make sure the image URL is reachable by QQ servers; local paths must match the AstrBot runtime environment.
+- 欢迎图片不显示
+  - 确认图片 URL 可被 QQ 服务器访问；本地路径需与 AstrBot 运行环境匹配。
 
-- At segment not working
-  - The `{at}` placeholder is only supported on aiocqhttp; QQ official API and other platforms do not support At segments.
+- At 消息段不生效
+  - `{at}` 占位符仅 aiocqhttp 平台支持；QQ 官方接口等平台不支持 At 消息段。
