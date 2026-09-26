@@ -91,7 +91,3 @@
 
 - At 消息段不生效
   - `{at}` 占位符仅 aiocqhttp 平台支持；QQ 官方接口等平台不支持 At 消息段。
-
-## 灵感来源
-
-插件结构与配置方式参考了 AstrBot 官方插件开发指南：https://github.com/AstrBotDevs/AstrBot
