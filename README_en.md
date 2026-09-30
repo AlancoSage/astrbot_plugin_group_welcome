@@ -15,6 +15,8 @@ Automatically sends a welcome message when a new member joins a group. Supports 
   - `{group}`: group ID
 - Group allowlist/denylist filtering: denylist mode (groups in the list are skipped) or allowlist mode (only listed groups are welcomed), selected via a dropdown in the WebUI.
 - Admin commands: set/view/delete the current group's welcome text and image directly in group chat; synced with the WebUI config.
+- Delayed welcome: a global default delay in seconds, customizable per group.
+- Random welcome messages: write multiple lines in the welcome text, separated by line breaks; one line is picked at random on each join.
 - Per-group welcomes are managed as cards (template_list) in the WebUI: add, expand-edit, and delete per group.
 - A failure to send a single welcome message does not affect the plugin; the error is logged.
 
@@ -41,15 +43,17 @@ The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to
 | `list_mode` | `string` | `blacklist` | List mode: `blacklist` / `whitelist` (dropdown in the WebUI) |
 | `blacklist` | `list[string]` | `[]` | Group denylist, effective in blacklist mode. Group IDs |
 | `whitelist` | `list[string]` | `[]` | Group allowlist, effective in whitelist mode. Group IDs |
-| `group_welcomes` | `template_list` | `[]` | Per-group welcome cards, each with group ID, welcome message, and image |
+| `group_welcomes` | `template_list` | `[]` | Per-group welcome cards, each with group ID, welcome message, image, and delay |
+| `welcome_delay_sec` | `int` | `0` | Global default delay in seconds before sending, 0 means immediately; used when a group has no per-group delay |
 
 ### `group_welcomes` entry fields
 
 | Field | Type | Description |
 |---|---|---|
 | `group_id` | `string` | Group ID to customize |
-| `welcome` | `text` | Welcome message for this group. Placeholders supported. Falls back to the global message when empty |
+| `welcome` | `text` | Welcome message for this group. Placeholders supported. Multiple lines are picked at random. Falls back to the global message when empty |
 | `image` | `string` | Welcome image for this group (URL or local path). Falls back to the global image when empty |
+| `delay` | `int` | Delay in seconds before sending for this group. 0 or empty falls back to the global delay |
 
 Example (equivalent to adding one card in the WebUI):
 

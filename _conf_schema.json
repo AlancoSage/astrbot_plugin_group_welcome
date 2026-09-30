@@ -14,6 +14,11 @@
     "type": "string",
     "default": ""
   },
+  "welcome_delay_sec": {
+    "description": "全局默认延迟欢迎秒数。检测到入群后等待 N 秒再发送欢迎，0 表示立即发送。当某个群没有单独设置延迟时使用",
+    "type": "int",
+    "default": 0
+  },
   "group_welcomes": {
     "description": "每群单独欢迎语，点击添加条目为每个群配置。设置后优先于全局欢迎语",
     "type": "template_list",
@@ -31,12 +36,17 @@
           "welcome": {
             "description": "欢迎语",
             "type": "text",
-            "hint": "支持占位符：{at} AT新人，{name} 新人昵称，{group} 群号"
+            "hint": "支持占位符：{at} AT新人，{name} 新人昵称，{group} 群号。可写多行，多条用换行分隔，发送时随机抽取一条"
           },
           "image": {
             "description": "欢迎图片（可选）",
             "type": "string",
             "hint": "填图片 URL 或本地路径，留空不发送图片。留空时使用全局默认图片"
+          },
+          "delay": {
+            "description": "延迟欢迎秒数（可选）",
+            "type": "int",
+            "hint": "入群后等待 N 秒再发送欢迎，0 或留空时使用全局默认延迟"
           }
         }
       }

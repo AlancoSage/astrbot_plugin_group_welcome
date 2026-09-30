@@ -1,3 +1,6 @@
+import asyncio
+import random
+
 import aiohttp
 import astrbot.api.message_components as Comp
 from astrbot.api import AstrBotConfig, logger
@@ -32,19 +35,24 @@ class GroupWelcomePlugin(Star):
                 group_id, welcome = group_id.strip(), welcome.strip()
                 image = ""
             if group_id and (welcome or image):
-                result[group_id] = {"welcome": welcome, "image": image}
+                result[group_id] = {
+                    "welcome": welcome,
+                    "image": image,
+                    "delay": str(item.get("delay", "")).strip() if isinstance(item, dict) else "",
+                }
         return result
 
     def _write_group_welcomes(
         self, welcomes: dict[str, dict[str, str]]
     ) -> None:
-        """把 {群号: {"welcome": 文本, "image": 图片}} 写回 template_list 配置并保存"""
+        """把 {群号: {"welcome": 文本, "image": 图片, "delay": 延迟}} 写回 template_list 配置并保存"""
         self.config["group_welcomes"] = [
             {
                 "__template_key": "group_welcome",
                 "group_id": group_id,
                 "welcome": rule.get("welcome", ""),
                 "image": rule.get("image", ""),
+                "delay": rule.get("delay", ""),
             }
             for group_id, rule in welcomes.items()
         ]
@@ -81,6 +89,17 @@ class GroupWelcomePlugin(Star):
         if not welcome and not image:
             return
 
+        # 延迟欢迎：群配置优先，回退全局延迟
+        try:
+            delay = int(rule.get("delay") or self.config.get("welcome_delay_sec", 0) or 0)
+        except (TypeError, ValueError):
+            delay = 0
+        if delay > 0:
+            logger.info(f"群 {group_id} 延迟 {delay} 秒后发送欢迎")
+            await asyncio.sleep(delay)
+            if not self.config.get("enabled", True):
+                return
+
         chain = self._build_chain(welcome, event, new_user_id)
         if image:
             chain.append(Comp.Image(file=image))
@@ -104,7 +123,14 @@ class GroupWelcomePlugin(Star):
     def _build_chain(
         self, welcome: str, event: AstrMessageEvent, new_user_id: str
     ) -> list:
-        """把欢迎语文本解析为消息链，支持 {at}、{name}、{group} 占位符"""
+        """把欢迎语文本解析为消息链，支持 {at}、{name}、{group} 占位符
+
+        欢迎语可包含多行，多条用换行分隔，发送时随机抽取一条。
+        """
+        lines = [line.strip() for line in welcome.splitlines() if line.strip()]
+        if len(lines) > 1:
+            welcome = random.choice(lines)
+
         parts = welcome.split("{at}")
         chain: list = []
         sender_name = "新朋友"
