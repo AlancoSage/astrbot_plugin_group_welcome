@@ -62,15 +62,20 @@ class GroupWelcomePlugin(Star):
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE, priority=5)
     async def on_group_message(self, event: AstrMessageEvent):
-        """监听群消息，检测入群通知并发送欢迎语"""
-        if not self.config.get("enabled", True):
-            return
-
+        """监听群消息，检测入群/退群通知并发送欢迎语或退群提示"""
         raw = event.message_obj.raw_message
         # aiocqhttp 适配器会把 OneBot 的 notice 事件原样放在 raw_message 中
-        if not isinstance(raw, dict):
+        if not isinstance(raw, dict) or raw.get("post_type") != "notice":
             return
-        if raw.get("post_type") != "notice" or raw.get("notice_type") != "group_increase":
+
+        if raw.get("notice_type") == "group_increase":
+            await self._handle_join(event, raw)
+        elif raw.get("notice_type") == "group_decrease":
+            await self._handle_leave(event, raw)
+
+    async def _handle_join(self, event: AstrMessageEvent, raw: dict):
+        """处理入群通知，发送欢迎语"""
+        if not self.config.get("enabled", True):
             return
 
         group_id = str(event.message_obj.group_id)
@@ -107,6 +112,31 @@ class GroupWelcomePlugin(Star):
             await event.send(event.chain_result(chain))
         except Exception as e:
             logger.error(f"发送入群欢迎失败: {e}")
+
+    async def _handle_leave(self, event: AstrMessageEvent, raw: dict):
+        """处理退群通知，发送退群提示"""
+        if not self.config.get("leave_enabled", True):
+            return
+
+        # kick_me 是机器人自己被踢，不需要提示
+        if raw.get("sub_type") == "kick_me":
+            return
+
+        group_id = str(event.message_obj.group_id)
+        leave_user_id = str(raw.get("user_id", ""))
+        logger.info(f"检测到成员退群: 群 {group_id}, 用户 {leave_user_id}")
+
+        leave_text = str(self.config.get("global_leave", "{user} 退出了本群")).strip()
+        if not leave_text:
+            return
+
+        text = leave_text.replace("{user}", leave_user_id).replace(
+            "{group}", group_id
+        )
+        try:
+            await event.send(event.plain_result(text))
+        except Exception as e:
+            logger.error(f"发送退群提示失败: {e}")
 
     def _group_allowed(self, group_id: str) -> bool:
         """根据黑白名单判断该群是否启用欢迎

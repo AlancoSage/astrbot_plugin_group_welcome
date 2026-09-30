@@ -4,6 +4,16 @@
     "type": "bool",
     "default": true
   },
+  "leave_enabled": {
+    "description": "是否启用退群提示",
+    "type": "bool",
+    "default": true
+  },
+  "global_leave": {
+    "description": "全局退群提示语。支持占位符：{user} 退群成员QQ号，{group} 群号。留空不发送",
+    "type": "text",
+    "default": "{user} 退出了本群"
+  },
   "global_welcome": {
     "description": "全局默认欢迎语。当某个群没有单独设置欢迎语时使用。支持占位符：{at} AT新人，{name} 新人昵称，{group} 群号",
     "type": "text",
