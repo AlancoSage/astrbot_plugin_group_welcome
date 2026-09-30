@@ -1,3 +1,4 @@
+import aiohttp
 import astrbot.api.message_components as Comp
 from astrbot.api import AstrBotConfig, logger
 from astrbot.api.event import AstrMessageEvent, filter
@@ -163,8 +164,8 @@ class GroupWelcomePlugin(Star):
         yield event.plain_result(f"已设置群 {group_id} 的欢迎语。")
 
     @welcome_group.command("图片")
-    async def welcome_image(self, event: AstrMessageEvent, image: str):
-        """为当前群设置欢迎图片（图片 URL 或本地路径），留空参数则清除"""
+    async def welcome_image(self, event: AstrMessageEvent, image: str = ""):
+        """为当前群设置欢迎图片：回复一条图片消息使用该图，或填图片 URL/本地路径，填「无/清除/删除」清除"""
         if msg := self._check_admin(event):
             yield event.plain_result(msg)
             return
@@ -174,15 +175,61 @@ class GroupWelcomePlugin(Star):
         group_id = str(event.message_obj.group_id)
         welcomes = self._parse_group_welcomes()
         rule = dict(welcomes.get(group_id) or {"welcome": "", "image": ""})
-        if not image or image in ("无", "清除", "删除"):
+        yields = ""
+
+        if not image:
+            # 未填参数：尝试从引用（回复）的消息中提取图片并保存到本地
+            local_path = await self._save_reply_image(event, group_id)
+            if local_path:
+                rule["image"] = local_path
+                yields = "已将回复的图片保存到本地，并设为群 {g} 的欢迎图片。"
+            else:
+                yields = "未找到图片。请回复一条图片消息后使用该指令，或直接填图片 URL/本地路径。"
+        elif image in ("无", "清除", "删除"):
             rule["image"] = ""
             yields = "已清除群 {g} 的欢迎图片。"
         else:
             rule["image"] = image
             yields = "已设置群 {g} 的欢迎图片。"
+
         welcomes[group_id] = rule
         self._write_group_welcomes(welcomes)
         yield event.plain_result(yields.format(g=group_id))
+
+    async def _save_reply_image(self, event: AstrMessageEvent, group_id: str) -> str:
+        """从引用（回复）的消息中提取图片，下载保存到本地 data 目录，返回本地路径"""
+        img_url = ""
+        for seg in event.message_obj.message:
+            if type(seg).__name__ == "Reply" and getattr(seg, "chain", None):
+                for sub in seg.chain:
+                    if type(sub).__name__ == "Image":
+                        img_url = getattr(sub, "url", "") or getattr(sub, "file", "")
+                        break
+            if img_url:
+                break
+        if not img_url:
+            return ""
+        try:
+            import aiohttp
+
+            img_dir = Path("data/plugin_data/astrbot_plugin_group_welcome/images")
+            img_dir.mkdir(parents=True, exist_ok=True)
+            ext = ".jpg"
+            if ".png" in img_url.lower():
+                ext = ".png"
+            elif ".gif" in img_url.lower():
+                ext = ".gif"
+            local_path = img_dir / f"group_{group_id}{ext}"
+            async with aiohttp.ClientSession() as session:
+                async with session.get(img_url, timeout=aiohttp.ClientTimeout(total=30)) as resp:
+                    if resp.status != 200:
+                        logger.error(f"下载图片失败: HTTP {resp.status}")
+                        return ""
+                    local_path.write_bytes(await resp.read())
+            return str(local_path)
+        except Exception as e:
+            logger.error(f"保存引用图片失败: {e}")
+            return ""
 
     @welcome_group.command("查看")
     async def welcome_get(self, event: AstrMessageEvent):

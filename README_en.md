@@ -71,7 +71,7 @@ Example (equivalent to adding one card in the WebUI):
 | Command | Description |
 |---|---|
 | `/欢迎设置 <message>` | Set the welcome message for the current group |
-| `/欢迎图片 <URL or path>` | Set the welcome image for the current group; pass "无 / 清除 / 删除" to clear it |
+| `/欢迎图片 <URL or path>` | Set the welcome image for the current group: reply to an image message to use it (saved locally), or pass an image URL/local path; pass "无 / 清除 / 删除" to clear it |
 | `/欢迎查看` | Show the current group's welcome message and image |
 | `/欢迎删除` | Delete the current group's config and fall back to the global default |
 
