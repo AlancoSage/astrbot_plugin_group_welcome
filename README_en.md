@@ -13,7 +13,7 @@ Automatically sends a welcome message when a new member joins a group. Supports 
   - `{at}`: mention the new member (At segment, aiocqhttp only)
   - `{name}`: nickname of the new member
   - `{group}`: group ID
-- Group allowlist/denylist filtering: denylist mode (groups in the list are skipped) or allowlist mode (only listed groups are welcomed), selected via a dropdown in the WebUI.
+- Group allowlist/denylist filtering, coexisting: the denylist is always effective (listed groups are skipped); when the allowlist is non-empty, only listed groups are welcomed (denylist takes precedence).
 - Admin commands: set/view/delete the current group's welcome text and image directly in group chat; synced with the WebUI config.
 - Delayed welcome: a global default delay in seconds, customizable per group.
 - Random welcome messages: write multiple lines in the welcome text, separated by line breaks; one line is picked at random on each join.
@@ -40,9 +40,9 @@ The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to
 | `enabled` | `bool` | `true` | Enable the welcome feature |
 | `global_welcome` | `text` | `Welcome {at}!` | Global default welcome message, used when a group has no per-group config. Placeholders supported |
 | `global_image` | `string` | `""` | Global default welcome image (URL or local path). Empty means no image |
-| `list_mode` | `string` | `blacklist` | List mode: `blacklist` / `whitelist` (dropdown in the WebUI) |
-| `blacklist` | `list[string]` | `[]` | Group denylist, effective in blacklist mode. Group IDs |
-| `whitelist` | `list[string]` | `[]` | Group allowlist, effective in whitelist mode. Group IDs |
+| `list_mode` | `string` | `blacklist` | Deprecated; lists now coexist, no need to configure |
+| `blacklist` | `list[string]` | `[]` | Group denylist, always effective and takes precedence; listed groups get no welcome |
+| `whitelist` | `list[string]` | `[]` | Group allowlist. Empty means no restriction; non-empty means only listed groups are welcomed |
 | `group_welcomes` | `template_list` | `[]` | Per-group welcome cards, each with group ID, welcome message, image, and delay |
 | `welcome_delay_sec` | `int` | `0` | Global default delay in seconds before sending, 0 means immediately; used when a group has no per-group delay |
 

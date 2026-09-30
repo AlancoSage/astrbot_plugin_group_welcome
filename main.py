@@ -109,16 +109,19 @@ class GroupWelcomePlugin(Star):
             logger.error(f"发送入群欢迎失败: {e}")
 
     def _group_allowed(self, group_id: str) -> bool:
-        """根据黑白名单判断该群是否启用欢迎"""
-        mode = self.config.get("list_mode", "blacklist")
+        """根据黑白名单判断该群是否启用欢迎
 
+        黑白名单共存：白名单非空时仅白名单中的群欢迎；黑名单始终生效且优先级更高。
+        """
         def _norm(items) -> list[str]:
             return [str(i) for i in (items or [])]
 
-        if mode == "whitelist":
-            return group_id in _norm(self.config.get("whitelist"))
-        # 黑名单模式（默认）
-        return group_id not in _norm(self.config.get("blacklist"))
+        if group_id in _norm(self.config.get("blacklist")):
+            return False
+        whitelist = _norm(self.config.get("whitelist"))
+        if whitelist:
+            return group_id in whitelist
+        return True
 
     def _build_chain(
         self, welcome: str, event: AstrMessageEvent, new_user_id: str

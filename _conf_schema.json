@@ -52,20 +52,13 @@
       }
     }
   },
-  "list_mode": {
-    "description": "名单模式：黑名单模式（名单内的群不欢迎），白名单模式（仅名单内的群欢迎）",
-    "type": "string",
-    "default": "blacklist",
-    "options": ["blacklist", "whitelist"],
-    "labels": ["黑名单模式", "白名单模式"]
-  },
   "blacklist": {
-    "description": "群黑名单（黑名单模式下生效），填群号",
+    "description": "群黑名单，填群号。黑名单始终生效且优先级最高，命中的群不发送欢迎",
     "type": "list",
     "default": []
   },
   "whitelist": {
-    "description": "群白名单（白名单模式下生效），填群号",
+    "description": "群白名单，填群号。留空表示不限制；非空时仅白名单中的群发送欢迎",
     "type": "list",
     "default": []
   }
