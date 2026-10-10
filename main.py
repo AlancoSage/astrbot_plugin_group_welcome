@@ -1,5 +1,6 @@
 import asyncio
 import random
+from pathlib import Path
 
 import aiohttp
 import astrbot.api.message_components as Comp
@@ -186,12 +187,7 @@ class GroupWelcomePlugin(Star):
         return chain
 
     # ---------- 管理指令 ----------
-    # 注意：permission_type 装饰器不支持叠加在 command_group 上（v4.28.1 会报错），
-    # 因此管理员校验在各指令函数内部进行。
-
-    @filter.command_group("欢迎")
-    def welcome_group(self):
-        """入群欢迎管理指令组（仅管理员）"""
+    # 单独注册指令（不使用 command_group），管理员校验在各指令函数内部进行。
 
     def _is_admin(self, event: AstrMessageEvent) -> bool:
         try:
@@ -205,7 +201,7 @@ class GroupWelcomePlugin(Star):
             return "该指令仅管理员可用。"
         return None
 
-    @welcome_group.command("设置")
+    @filter.command("欢迎设置")
     async def welcome_set(self, event: AstrMessageEvent, text: str):
         """为当前群设置欢迎语，例如：/欢迎设置 欢迎 {at} 加入本群！"""
         if msg := self._check_admin(event):
@@ -222,7 +218,7 @@ class GroupWelcomePlugin(Star):
         self._write_group_welcomes(welcomes)
         yield event.plain_result(f"已设置群 {group_id} 的欢迎语。")
 
-    @welcome_group.command("图片")
+    @filter.command("欢迎图片")
     async def welcome_image(self, event: AstrMessageEvent, image: str = ""):
         """为当前群设置欢迎图片：回复一条图片消息使用该图，或填图片 URL/本地路径，填「无/清除/删除」清除"""
         if msg := self._check_admin(event):
@@ -290,7 +286,7 @@ class GroupWelcomePlugin(Star):
             logger.error(f"保存引用图片失败: {e}")
             return ""
 
-    @welcome_group.command("查看")
+    @filter.command("欢迎查看")
     async def welcome_get(self, event: AstrMessageEvent):
         """查看当前群的欢迎语"""
         if msg := self._check_admin(event):
@@ -305,7 +301,7 @@ class GroupWelcomePlugin(Star):
         else:
             yield event.plain_result("当前群未单独设置欢迎语，将使用全局默认欢迎语。")
 
-    @welcome_group.command("删除")
+    @filter.command("欢迎删除")
     async def welcome_del(self, event: AstrMessageEvent):
         """删除当前群的欢迎语，恢复使用全局默认"""
         if msg := self._check_admin(event):
