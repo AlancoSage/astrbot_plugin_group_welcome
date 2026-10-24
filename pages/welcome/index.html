@@ -6,249 +6,474 @@
 <title>入群欢迎</title>
 <style>
   :root {
-    --bg: #f6f7f9;
+    --bg: #f4f6fa;
+    --bg-soft: #eef1f7;
     --card: #ffffff;
-    --text: #1f2328;
+    --text: #1b1f27;
     --muted: #6b7280;
-    --border: #e3e6ea;
+    --border: #e4e8ef;
     --primary: #5b6ef5;
-    --primary-soft: rgba(91, 110, 245, 0.12);
+    --primary-2: #8b5cf6;
+    --primary-soft: rgba(91, 110, 245, 0.1);
+    --success: #16a34a;
+    --success-soft: rgba(22, 163, 74, 0.12);
     --danger: #e5484d;
-    --shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
-    --radius: 12px;
+    --danger-soft: rgba(229, 72, 77, 0.1);
+    --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+    --shadow-md: 0 8px 24px rgba(16, 24, 40, 0.08);
+    --radius: 14px;
+    --radius-sm: 10px;
   }
   [data-theme="dark"] {
-    --bg: #16181d;
-    --card: #1f2229;
-    --text: #e6e8eb;
-    --muted: #9aa1ab;
-    --border: #2f333c;
-    --primary: #7c8cff;
-    --primary-soft: rgba(124, 140, 255, 0.16);
-    --danger: #ff6369;
-    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --bg: #14161b;
+    --bg-soft: #1b1e25;
+    --card: #1e2128;
+    --text: #e7e9ee;
+    --muted: #98a0ad;
+    --border: #2c313b;
+    --primary: #7f8dff;
+    --primary-2: #a78bfa;
+    --primary-soft: rgba(127, 141, 255, 0.14);
+    --success: #4ade80;
+    --success-soft: rgba(74, 222, 128, 0.14);
+    --danger: #ff6b70;
+    --danger-soft: rgba(255, 107, 112, 0.12);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.35);
   }
   * { box-sizing: border-box; }
+  html, body { height: 100%; }
   body {
     margin: 0;
-    padding: 20px;
-    background: var(--bg);
+    background:
+      radial-gradient(1200px 500px at 15% -10%, var(--primary-soft), transparent 60%),
+      radial-gradient(900px 420px at 100% 0%, rgba(139, 92, 246, 0.08), transparent 55%),
+      var(--bg);
     color: var(--text);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-      "Microsoft YaHei", sans-serif;
+      "Microsoft YaHei", "Noto Sans SC", sans-serif;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
   }
-  .wrap { max-width: 920px; margin: 0 auto; }
-  .page-head {
-    display: flex; align-items: flex-start; justify-content: space-between;
-    gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+  .shell { max-width: 980px; margin: 0 auto; padding: 22px 20px 90px; }
+
+  /* ---------- 顶部栏 ---------- */
+  .appbar {
+    position: sticky; top: 0; z-index: 20;
+    margin: 0 -20px 22px; padding: 14px 20px;
+    display: flex; align-items: center; gap: 14px;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border);
   }
-  .page-head h1 { margin: 0; font-size: 20px; font-weight: 600; }
-  .page-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .brand-mark {
+    width: 42px; height: 42px; flex: none; border-radius: 12px;
+    display: grid; place-items: center; color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    box-shadow: 0 6px 16px var(--primary-soft);
+  }
+  .brand-mark svg { width: 22px; height: 22px; }
+  .brand-text { min-width: 0; }
+  .brand-text h1 {
+    margin: 0; font-size: 17px; font-weight: 650; letter-spacing: 0.2px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .brand-text p { margin: 1px 0 0; font-size: 12.5px; color: var(--muted); }
+  .appbar-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+  /* ---------- 按钮 ---------- */
+  button {
+    font: inherit; cursor: pointer; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--card); color: var(--text);
+    padding: 8px 14px; display: inline-flex; align-items: center; gap: 6px;
+    transition: transform 0.12s ease, border-color 0.15s, background 0.15s, box-shadow 0.15s;
+  }
+  button:hover { border-color: var(--primary); color: var(--primary); }
+  button:active { transform: translateY(1px); }
+  button svg { width: 16px; height: 16px; }
+  button.primary {
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+    border-color: transparent; color: #fff;
+    box-shadow: 0 6px 16px var(--primary-soft);
+  }
+  button.primary:hover { color: #fff; filter: brightness(1.05); }
+  button.icon { padding: 8px; width: 38px; height: 38px; justify-content: center; }
+  button.dashed {
+    width: 100%; justify-content: center; border-style: dashed;
+    color: var(--muted); background: transparent; padding: 12px;
+  }
+  button.dashed:hover { color: var(--primary); border-color: var(--primary); background: var(--primary-soft); }
+  button.danger-ghost {
+    border-color: transparent; background: transparent; color: var(--danger);
+    padding: 6px 8px; border-radius: 8px;
+  }
+  button.danger-ghost:hover { background: var(--danger-soft); color: var(--danger); }
+
+  /* ---------- 概览 ---------- */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 18px; }
+  .stat {
+    background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 14px 16px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden;
+  }
+  .stat::after {
+    content: ""; position: absolute; inset: 0 0 auto auto; width: 90px; height: 90px;
+    background: radial-gradient(circle at 100% 0%, var(--primary-soft), transparent 70%);
+  }
+  .stat .k { font-size: 12px; color: var(--muted); }
+  .stat .v { font-size: 20px; font-weight: 650; margin-top: 2px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .dot.on { background: var(--success); box-shadow: 0 0 0 4px var(--success-soft); }
+  .dot.off { background: var(--danger); box-shadow: 0 0 0 4px var(--danger-soft); }
+  @media (max-width: 700px) { .stats { grid-template-columns: 1fr; } }
+
+  /* ---------- 卡片 ---------- */
   .card {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: var(--radius); box-shadow: var(--shadow);
-    padding: 16px 18px; margin-bottom: 14px;
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    margin-bottom: 16px; overflow: hidden;
   }
-  .card > h2 {
-    margin: 0 0 4px; font-size: 15px; font-weight: 600;
+  .card-head {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 16px 18px 12px; border-bottom: 1px solid var(--border);
   }
-  .card > .sub { margin: 0 0 12px; color: var(--muted); font-size: 12.5px; }
-  .row {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: 16px; padding: 8px 0;
+  .card-head .ico {
+    width: 34px; height: 34px; flex: none; border-radius: 10px;
+    display: grid; place-items: center; color: var(--primary);
+    background: var(--primary-soft);
   }
-  .row + .row { border-top: 1px dashed var(--border); }
-  .row .label { font-size: 13.5px; }
-  .row .hint { color: var(--muted); font-size: 12px; margin-top: 2px; }
-  .field { margin-top: 12px; }
-  .field > label {
-    display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;
+  .card-head .ico svg { width: 18px; height: 18px; }
+  .card-head h2 { margin: 0; font-size: 14.5px; font-weight: 650; }
+  .card-head .sub { margin: 1px 0 0; font-size: 12.5px; color: var(--muted); }
+  .card-head .head-action { margin-left: auto; }
+  .card-body { padding: 14px 18px 18px; }
+
+  /* ---------- 开关行 ---------- */
+  .switch-row { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
+  .switch-row + .switch-row { border-top: 1px dashed var(--border); }
+  .switch-row .meta { min-width: 0; }
+  .switch-row .meta .t { font-size: 13.5px; font-weight: 500; }
+  .switch-row .meta .d { font-size: 12px; color: var(--muted); }
+  .switch {
+    position: relative; display: inline-block; width: 44px; height: 25px;
+    flex: none; margin-left: auto;
   }
-  .field .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
-  input[type="text"], input[type="number"], textarea, select {
-    width: 100%; padding: 8px 10px; font: inherit; color: var(--text);
-    background: var(--bg); border: 1px solid var(--border);
-    border-radius: 8px; outline: none;
-  }
-  input:focus, textarea:focus, select:focus {
-    border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft);
-  }
-  textarea { min-height: 76px; resize: vertical; }
-  .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex: none; }
   .switch input { opacity: 0; width: 0; height: 0; }
   .slider {
     position: absolute; inset: 0; cursor: pointer; border-radius: 999px;
-    background: var(--border); transition: background 0.15s;
+    background: var(--border); transition: background 0.18s;
   }
   .slider::before {
-    content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
-    background: #fff; border-radius: 50%; transition: transform 0.15s;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    content: ""; position: absolute; width: 19px; height: 19px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: transform 0.18s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
   }
-  .switch input:checked + .slider { background: var(--primary); }
-  .switch input:checked + .slider::before { transform: translateX(18px); }
-  button {
-    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--border);
-    background: var(--card); color: var(--text); padding: 7px 14px;
+  .switch input:checked + .slider { background: linear-gradient(135deg, var(--primary), var(--primary-2)); }
+  .switch input:checked + .slider::before { transform: translateX(19px); }
+
+  /* ---------- 表单 ---------- */
+  .field { margin-top: 18px; }
+  .field:first-child { margin-top: 0; }
+  .field > label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12.5px; font-weight: 600; margin-bottom: 6px; color: var(--text);
   }
-  button:hover { border-color: var(--primary); color: var(--primary); }
-  button.primary {
-    background: var(--primary); border-color: var(--primary); color: #fff;
+  .field > label .tagkey {
+    font-weight: 500; font-size: 11px; color: var(--muted);
+    background: var(--bg-soft); border-radius: 5px; padding: 1px 6px;
   }
-  button.primary:hover { filter: brightness(1.06); color: #fff; }
-  button.ghost-danger { color: var(--danger); border-color: transparent; background: transparent; }
-  button.ghost-danger:hover { background: rgba(229, 72, 77, 0.1); }
-  .group-item {
-    border: 1px solid var(--border); border-radius: 10px;
-    padding: 12px 14px; margin-top: 10px; background: var(--bg);
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%; padding: 9px 11px; font: inherit; color: var(--text);
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
   }
-  .group-item .head {
-    display: flex; align-items: center; justify-content: space-between; gap: 10px;
-    margin-bottom: 8px;
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--primary); background: var(--card);
+    box-shadow: 0 0 0 3px var(--primary-soft);
   }
-  .group-item .head strong { font-size: 13.5px; }
-  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
-  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  textarea { min-height: 84px; resize: vertical; line-height: 1.7; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 5px; }
+  .hint code {
+    background: var(--bg-soft); border: 1px solid var(--border);
+    border-radius: 5px; padding: 0 4px; font-size: 11.5px;
+  }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 18px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ---------- 群卡片 ---------- */
+  .group-card {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg-soft); padding: 12px 14px; margin-bottom: 12px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .group-card:hover { border-color: color-mix(in srgb, var(--primary) 45%, var(--border)); }
+  .group-card .ghead {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+  }
+  .avatar {
+    width: 30px; height: 30px; flex: none; border-radius: 9px;
+    display: grid; place-items: center; font-size: 12.5px; font-weight: 650; color: #fff;
+    background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  }
+  .ghead .gname { font-size: 13.5px; font-weight: 600; }
+  .ghead .gbadge {
+    font-size: 11px; color: var(--muted); background: var(--card);
+    border: 1px solid var(--border); border-radius: 999px; padding: 1px 8px;
+  }
+  .ghead .spacer { margin-left: auto; }
   .empty {
-    padding: 18px; text-align: center; color: var(--muted);
-    border: 1px dashed var(--border); border-radius: 10px; margin-top: 10px;
-    font-size: 13px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 26px 16px; text-align: center; color: var(--muted); font-size: 13px;
+    border: 1px dashed var(--border); border-radius: var(--radius-sm);
   }
-  .save-bar {
-    position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 10px;
-    padding: 12px 0; background: linear-gradient(transparent, var(--bg) 40%);
+  .empty svg { width: 26px; height: 26px; opacity: 0.6; }
+
+  /* ---------- 底部保存条 ---------- */
+  .savebar {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 12px 20px;
+    background: color-mix(in srgb, var(--card) 88%, transparent);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid var(--border);
   }
+  .savebar .status { font-size: 12.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .savebar .status .dot { width: 7px; height: 7px; }
+  .savebar .status.dirty { color: var(--primary); }
+  .savebar .status.dirty .dot { background: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+
+  /* ---------- Toast ---------- */
   .toast {
-    position: fixed; right: 20px; bottom: 20px; padding: 10px 16px;
-    border-radius: 10px; background: #2f8f4e; color: #fff; font-size: 13px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18); opacity: 0; pointer-events: none;
-    transform: translateY(8px); transition: all 0.2s;
+    position: fixed; right: 20px; bottom: 74px; z-index: 40;
+    padding: 10px 16px; border-radius: 10px; font-size: 13px; color: #fff;
+    background: #1f9d55; box-shadow: var(--shadow-md);
+    opacity: 0; transform: translateY(8px); pointer-events: none;
+    transition: opacity 0.2s, transform 0.2s;
   }
   .toast.show { opacity: 1; transform: translateY(0); }
   .toast.error { background: #d33a3f; }
-  .tag {
-    display: inline-block; padding: 1px 8px; border-radius: 999px;
-    background: var(--primary-soft); color: var(--primary); font-size: 11.5px;
-    margin-left: 8px; vertical-align: middle;
+
+  /* ---------- 骨架屏 ---------- */
+  .skeleton {
+    height: 76px; border-radius: var(--radius);
+    background: linear-gradient(90deg, var(--bg-soft) 25%, var(--card) 37%, var(--bg-soft) 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.3s ease infinite; margin-bottom: 14px;
   }
+  @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
 </style>
 </head>
 <body>
-<div class="wrap">
-  <div class="page-head">
-    <div>
-      <h1>入群欢迎 <span class="tag">astrbot_plugin_group_welcome</span></h1>
-      <p>配置入群欢迎、退群提示与群黑白名单，保存后立即生效。</p>
+<div class="shell">
+  <header class="appbar">
+    <div class="brand">
+      <div class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1"/>
+          <circle cx="12" cy="12" r="3.2"/>
+        </svg>
+      </div>
+      <div class="brand-text">
+        <h1>入群欢迎</h1>
+        <p>入群欢迎 · 退群提示 · 每群定制 · 黑白名单</p>
+      </div>
     </div>
-    <div class="toolbar">
-      <button id="reload">重新加载</button>
-      <button class="primary" id="save">保存配置</button>
+    <div class="appbar-actions">
+      <button class="icon" id="reload" title="重新加载">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 11a8 8 0 1 0-2.3 6.3"/><path d="M20 5v6h-6"/>
+        </svg>
+      </button>
+      <button class="primary" id="save">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>
+        </svg>
+        保存配置
+      </button>
     </div>
-  </div>
+  </header>
 
-  <div class="card">
-    <h2>开关</h2>
-    <p class="sub">分别控制入群欢迎与退群提示。</p>
-    <div class="row">
+  <section class="stats" id="stats">
+    <div class="stat">
+      <div class="k">入群欢迎</div>
+      <div class="v"><span class="dot" id="dot-join"></span><span id="val-join">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="k">退群提示</div>
+      <div class="v"><span class="dot" id="dot-leave"></span><span id="val-leave">—</span></div>
+    </div>
+    <div class="stat">
+      <div class="k">单独配置的群</div>
+      <div class="v"><span id="val-groups">—</span></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v18M5 8h14M5 16h14"/>
+        </svg>
+      </div>
       <div>
-        <div class="label">启用入群欢迎</div>
-        <div class="hint">关闭后不再发送任何入群欢迎消息</div>
+        <h2>功能开关</h2>
+        <p class="sub">分别控制入群欢迎与退群提示</p>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="enabled" />
-        <span class="slider"></span>
-      </label>
     </div>
-    <div class="row">
+    <div class="card-body">
+      <div class="switch-row">
+        <div class="meta">
+          <div class="t">启用入群欢迎</div>
+          <div class="d">关闭后不再发送任何入群欢迎消息</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="enabled" /><span class="slider"></span></label>
+      </div>
+      <div class="switch-row">
+        <div class="meta">
+          <div class="t">启用退群提示</div>
+          <div class="d">关闭后不再发送退群提示</div>
+        </div>
+        <label class="switch"><input type="checkbox" id="leave_enabled" /><span class="slider"></span></label>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 6h16M4 12h16M4 18h10"/>
+        </svg>
+      </div>
       <div>
-        <div class="label">启用退群提示</div>
-        <div class="hint">关闭后不再发送退群提示</div>
+        <h2>全局配置</h2>
+        <p class="sub">某个群没有单独配置时使用这里的设置</p>
       </div>
-      <label class="switch">
-        <input type="checkbox" id="leave_enabled" />
-        <span class="slider"></span>
-      </label>
     </div>
-  </div>
+    <div class="card-body">
+      <div class="field">
+        <label>默认欢迎语 <span class="tagkey">global_welcome</span></label>
+        <textarea id="global_welcome" placeholder="欢迎 {at} 加入本群！"></textarea>
+        <div class="hint">
+          占位符：<code>{at}</code> AT新人 · <code>{name}</code> 昵称 · <code>{user}</code> QQ号 · <code>{group}</code> 群号。可写多行，发送时随机抽取一条。
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>默认欢迎图片 <span class="tagkey">global_image</span></label>
+          <input type="text" id="global_image" placeholder="图片 URL 或本地路径，留空不发图" />
+        </div>
+        <div class="field">
+          <label>默认延迟（秒） <span class="tagkey">welcome_delay_sec</span></label>
+          <input type="number" id="welcome_delay_sec" min="0" step="1" placeholder="0" />
+        </div>
+      </div>
+      <div class="field">
+        <label>默认退群提示语 <span class="tagkey">global_leave</span></label>
+        <textarea id="global_leave" placeholder="{name}（{user}）退出了本群"></textarea>
+        <div class="hint">占位符：<code>{name}</code> · <code>{user}</code> · <code>{group}</code>。留空则不发送退群提示。</div>
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
-    <h2>全局配置</h2>
-    <p class="sub">某个群没有单独配置时使用这里的设置。</p>
-    <div class="field">
-      <label for="global_welcome">默认欢迎语</label>
-      <textarea id="global_welcome" placeholder="欢迎 {at} 加入本群！"></textarea>
-      <div class="hint">
-        占位符：{at} AT新人，{name} 成员昵称，{user} 成员QQ号，{group} 群号。可写多行，多条随机抽取。
+  <section class="card">
+    <div class="card-head">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z"/><path d="M9.5 12l1.8 1.8L15 10"/>
+        </svg>
+      </div>
+      <div>
+        <h2>群黑白名单</h2>
+        <p class="sub">黑名单优先级最高；白名单非空时仅白名单内的群生效</p>
       </div>
     </div>
-    <div class="grid2">
-      <div class="field">
-        <label for="global_image">默认欢迎图片</label>
-        <input type="text" id="global_image" placeholder="图片 URL 或本地路径，留空不发图" />
-      </div>
-      <div class="field">
-        <label for="welcome_delay_sec">默认延迟（秒）</label>
-        <input type="number" id="welcome_delay_sec" min="0" step="1" placeholder="0" />
+    <div class="card-body">
+      <div class="grid2">
+        <div class="field">
+          <label>黑名单群号 <span class="tagkey">blacklist</span></label>
+          <textarea id="blacklist" placeholder="每行一个群号"></textarea>
+          <div class="hint">命中的群不发送任何消息</div>
+        </div>
+        <div class="field">
+          <label>白名单群号 <span class="tagkey">whitelist</span></label>
+          <textarea id="whitelist" placeholder="留空表示不限制"></textarea>
+          <div class="hint">非空时仅这些群生效</div>
+        </div>
       </div>
     </div>
-    <div class="field">
-      <label for="global_leave">默认退群提示语</label>
-      <textarea id="global_leave" placeholder="{name}（{user}）退出了本群"></textarea>
-      <div class="hint">占位符：{name} 成员昵称，{user} 成员QQ号，{group} 群号。留空不发送。</div>
-    </div>
-  </div>
+  </section>
 
-  <div class="card">
-    <h2>群黑白名单</h2>
-    <p class="sub">
-      黑名单始终生效且优先级最高；白名单非空时仅白名单中的群生效，留空表示不限制。
-    </p>
-    <div class="grid2">
-      <div class="field">
-        <label for="blacklist">黑名单群号</label>
-        <textarea id="blacklist" placeholder="每行一个群号"></textarea>
+  <section class="card">
+    <div class="card-head">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20"/>
+          <circle cx="10" cy="8" r="3.2"/><path d="M19 20v-1.5a3.5 3.5 0 0 0-2.6-3.4M16.2 5.2a3.2 3.2 0 0 1 0 5.6"/>
+        </svg>
       </div>
-      <div class="field">
-        <label for="whitelist">白名单群号</label>
-        <textarea id="whitelist" placeholder="每行一个群号"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="page-head" style="margin-bottom: 6px">
       <div>
         <h2>每群欢迎语</h2>
-        <p class="sub">为指定群单独配置欢迎语、图片和延迟，优先于全局配置。</p>
+        <p class="sub">为指定群单独配置欢迎语、图片和延迟，优先于全局配置</p>
       </div>
-      <button id="add-welcome">+ 添加群</button>
+      <div class="head-action">
+        <button id="add-welcome">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          添加群
+        </button>
+      </div>
     </div>
-    <div id="welcome-list"></div>
-  </div>
+    <div class="card-body">
+      <div id="welcome-list"></div>
+      <button class="dashed" id="add-welcome-2">+ 添加一个群的单独欢迎配置</button>
+    </div>
+  </section>
 
-  <div class="card">
-    <div class="page-head" style="margin-bottom: 6px">
+  <section class="card">
+    <div class="card-head">
+      <div class="ico">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>
+        </svg>
+      </div>
       <div>
         <h2>每群退群提示</h2>
-        <p class="sub">为指定群单独配置退群提示语，优先于全局配置。</p>
+        <p class="sub">为指定群单独配置退群提示语，优先于全局配置</p>
       </div>
-      <button id="add-leave">+ 添加群</button>
+      <div class="head-action">
+        <button id="add-leave">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+          添加群
+        </button>
+      </div>
     </div>
-    <div id="leave-list"></div>
-  </div>
+    <div class="card-body">
+      <div id="leave-list"></div>
+      <button class="dashed" id="add-leave-2">+ 添加一个群的单独退群提示</button>
+    </div>
+  </section>
+</div>
 
-  <div class="save-bar">
-    <button id="save-bottom" class="primary">保存配置</button>
-  </div>
+<div class="savebar">
+  <div class="status" id="status"><span class="dot"></span><span id="status-text">配置已同步</span></div>
+  <button class="primary" id="save-bottom">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h7V4M8 20v-6h8v6"/>
+    </svg>
+    保存配置
+  </button>
 </div>
 <div class="toast" id="toast"></div>
 
 <script>
   const bridge = window.AstrBotPluginPage;
   const $ = (id) => document.getElementById(id);
+  const EMPTY_ICON =
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg>';
+
   let state = {
     enabled: true,
     leave_enabled: true,
@@ -261,13 +486,28 @@
     group_welcomes: [],
     group_leaves: [],
   };
+  let dirty = false;
 
   function toast(message, isError) {
     const el = $("toast");
     el.textContent = message;
     el.className = "toast show" + (isError ? " error" : "");
     clearTimeout(el._timer);
-    el._timer = setTimeout(() => { el.className = "toast"; }, 2200);
+    el._timer = setTimeout(() => { el.className = "toast"; }, 2400);
+  }
+
+  function markDirty() {
+    dirty = true;
+    const box = $("status");
+    box.classList.add("dirty");
+    $("status-text").textContent = "有未保存的修改";
+  }
+
+  function markClean() {
+    dirty = false;
+    const box = $("status");
+    box.classList.remove("dirty");
+    $("status-text").textContent = "配置已同步";
   }
 
   function linesToArray(text) {
@@ -282,17 +522,44 @@
       .replace(/"/g, "&quot;");
   }
 
+  function avatarChar(groupId) {
+    const text = String(groupId || "").trim();
+    return text ? text.slice(-2) : "群";
+  }
+
+  function renderStats() {
+    const joinOn = !!state.enabled;
+    const leaveOn = !!state.leave_enabled;
+    $("dot-join").className = "dot " + (joinOn ? "on" : "off");
+    $("val-join").textContent = joinOn ? "已开启" : "已关闭";
+    $("dot-leave").className = "dot " + (leaveOn ? "on" : "off");
+    $("val-leave").textContent = leaveOn ? "已开启" : "已关闭";
+    const ids = new Set();
+    (state.group_welcomes || []).forEach((row) => row.group_id && ids.add(String(row.group_id).trim()));
+    (state.group_leaves || []).forEach((row) => row.group_id && ids.add(String(row.group_id).trim()));
+    ids.delete("");
+    $("val-groups").textContent = ids.size ? ids.size + " 个" : "无";
+  }
+
   function renderWelcomeList() {
     const box = $("welcome-list");
+    $("add-welcome-2").style.display = state.group_welcomes.length ? "" : "none";
     if (!state.group_welcomes.length) {
-      box.innerHTML = '<div class="empty">暂无单独配置的群，入群时使用全局配置。</div>';
+      box.innerHTML = '<div class="empty">' + EMPTY_ICON + '<div>暂无单独配置的群，入群时使用全局配置<br/>点击右上角「添加群」开始配置</div></div>';
       return;
     }
     box.innerHTML = state.group_welcomes.map((row, index) => `
-      <div class="group-item" data-index="${index}">
-        <div class="head">
-          <strong>群 ${escapeHtml(row.group_id || "未填写")}</strong>
-          <button class="ghost-danger" data-remove-welcome="${index}">删除</button>
+      <div class="group-card" data-index="${index}">
+        <div class="ghead">
+          <div class="avatar">${escapeHtml(avatarChar(row.group_id))}</div>
+          <div class="gname">群 ${escapeHtml(row.group_id || "未填写")}</div>
+          <div class="gbadge">${row.delay ? "延迟 " + escapeHtml(row.delay) + "s" : "默认延迟"}</div>
+          <div class="spacer"></div>
+          <button class="danger-ghost" data-remove-welcome="${index}" title="删除">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>
+            </svg>
+          </button>
         </div>
         <div class="grid2">
           <div class="field">
@@ -300,8 +567,8 @@
             <input type="text" data-field="group_id" value="${escapeHtml(row.group_id)}" placeholder="群号" />
           </div>
           <div class="field">
-            <label>延迟（秒，留空用全局）</label>
-            <input type="text" data-field="delay" value="${escapeHtml(row.delay)}" placeholder="留空" />
+            <label>延迟（秒）</label>
+            <input type="text" data-field="delay" value="${escapeHtml(row.delay)}" placeholder="留空用全局" />
           </div>
         </div>
         <div class="field">
@@ -318,15 +585,23 @@
 
   function renderLeaveList() {
     const box = $("leave-list");
+    $("add-leave-2").style.display = state.group_leaves.length ? "" : "none";
     if (!state.group_leaves.length) {
-      box.innerHTML = '<div class="empty">暂无单独配置的群，退群时使用全局提示语。</div>';
+      box.innerHTML = '<div class="empty">' + EMPTY_ICON + '<div>暂无单独配置的群，退群时使用全局提示语<br/>点击右上角「添加群」开始配置</div></div>';
       return;
     }
     box.innerHTML = state.group_leaves.map((row, index) => `
-      <div class="group-item" data-index="${index}">
-        <div class="head">
-          <strong>群 ${escapeHtml(row.group_id || "未填写")}</strong>
-          <button class="ghost-danger" data-remove-leave="${index}">删除</button>
+      <div class="group-card" data-index="${index}">
+        <div class="ghead">
+          <div class="avatar">${escapeHtml(avatarChar(row.group_id))}</div>
+          <div class="gname">群 ${escapeHtml(row.group_id || "未填写")}</div>
+          <div class="gbadge">退群提示</div>
+          <div class="spacer"></div>
+          <button class="danger-ghost" data-remove-leave="${index}" title="删除">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/>
+            </svg>
+          </button>
         </div>
         <div class="field">
           <label>群号</label>
@@ -349,6 +624,7 @@
     $("welcome_delay_sec").value = state.welcome_delay_sec ?? 0;
     $("blacklist").value = (state.blacklist || []).join("\n");
     $("whitelist").value = (state.whitelist || []).join("\n");
+    renderStats();
     renderWelcomeList();
     renderLeaveList();
   }
@@ -373,6 +649,7 @@
       const data = await bridge.apiGet("/welcome/config");
       state = Object.assign(state, data || {});
       render();
+      markClean();
     } catch (error) {
       toast("读取配置失败：" + error.message, true);
     }
@@ -384,6 +661,7 @@
       const data = await bridge.apiPost("/welcome/config", state);
       state = Object.assign(state, data || {});
       render();
+      markClean();
       toast("配置已保存");
     } catch (error) {
       toast("保存失败：" + error.message, true);
@@ -391,7 +669,8 @@
   }
 
   document.addEventListener("input", (event) => {
-    const item = event.target.closest(".group-item");
+    markDirty();
+    const item = event.target.closest(".group-card");
     if (!item) return;
     const isWelcome = !!item.closest("#welcome-list");
     const list = isWelcome ? state.group_welcomes : state.group_leaves;
@@ -399,36 +678,55 @@
     const field = event.target.dataset.field;
     if (!row || !field) return;
     row[field] = event.target.value;
+    renderStats();
   });
+
+  document.addEventListener("change", () => markDirty());
 
   document.addEventListener("click", (event) => {
-    const removeWelcome = event.target.dataset.removeWelcome;
-    const removeLeave = event.target.dataset.removeLeave;
-    if (removeWelcome !== undefined) {
-      state.group_welcomes.splice(Number(removeWelcome), 1);
+    const removeWelcome = event.target.closest("[data-remove-welcome]");
+    const removeLeave = event.target.closest("[data-remove-leave]");
+    if (removeWelcome) {
+      state.group_welcomes.splice(Number(removeWelcome.dataset.removeWelcome), 1);
       renderWelcomeList();
+      renderStats();
+      markDirty();
     }
-    if (removeLeave !== undefined) {
-      state.group_leaves.splice(Number(removeLeave), 1);
+    if (removeLeave) {
+      state.group_leaves.splice(Number(removeLeave.dataset.removeLeave), 1);
       renderLeaveList();
+      renderStats();
+      markDirty();
     }
   });
 
-  $("add-welcome").addEventListener("click", () => {
+  function addWelcome() {
     syncFormToState();
     state.group_welcomes.push({ group_id: "", welcome: "", image: "", delay: "", leave: "" });
     renderWelcomeList();
-  });
+    markDirty();
+  }
 
-  $("add-leave").addEventListener("click", () => {
+  function addLeave() {
     syncFormToState();
     state.group_leaves.push({ group_id: "", welcome: "", image: "", delay: "", leave: "" });
     renderLeaveList();
-  });
+    markDirty();
+  }
 
+  $("add-welcome").addEventListener("click", addWelcome);
+  $("add-welcome-2").addEventListener("click", addWelcome);
+  $("add-leave").addEventListener("click", addLeave);
+  $("add-leave-2").addEventListener("click", addLeave);
   $("save").addEventListener("click", save);
   $("save-bottom").addEventListener("click", save);
   $("reload").addEventListener("click", load);
+
+  window.addEventListener("beforeunload", (event) => {
+    if (!dirty) return;
+    event.preventDefault();
+    event.returnValue = "";
+  });
 
   if (bridge) {
     bridge.ready().then(load);
