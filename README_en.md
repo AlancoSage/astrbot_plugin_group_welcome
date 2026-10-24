@@ -11,10 +11,11 @@ Automatically sends a welcome message when a new member joins a group. Supports 
 - Per-group welcome messages support an attached image (URL or local path); image-only welcomes are also supported.
 - Placeholders:
   - `{at}`: mention the new member (At segment, aiocqhttp only)
-  - `{name}`: nickname of the new member
+  - `{name}`: member nickname (fetched through the bot API, group card first; works in leave notices too)
+  - `{user}`: member QQ ID
   - `{group}`: group ID
 - Group allowlist/denylist filtering, coexisting: the denylist is always effective (listed groups are skipped); when the allowlist is non-empty, only listed groups are welcomed (denylist takes precedence).
-- Leave notice: automatically sends a message when a member leaves the group, with an independent toggle and customizable message (placeholders `{user}`, `{group}`); per-group messages are supported; no notice when the bot itself is kicked (`kick_me`).
+- Leave notice: automatically sends a message when a member leaves the group, with an independent toggle and customizable message (placeholders `{name}`, `{user}`, `{group}`); per-group messages are supported; no notice when the bot itself is kicked (`kick_me`).
 - Admin commands: set/view/delete the current group's welcome text and image directly in group chat; synced with the WebUI config.
 - Delayed welcome: a global default delay in seconds, customizable per group.
 - Random welcome messages: write multiple lines in the welcome text, separated by line breaks; one line is picked at random on each join.
@@ -40,7 +41,7 @@ The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to
 |---|---|---|---|
 | `enabled` | `bool` | `true` | Enable the welcome feature |
 | `leave_enabled` | `bool` | `true` | Enable the leave notice |
-| `global_leave` | `text` | `{user} 退出了本群` | Global leave notice message, placeholders `{user}` (leaving member ID) and `{group}` (group ID). Empty means no notice |
+| `global_leave` | `text` | `{user} 退出了本群` | Global leave notice message, placeholders `{name}` (member nickname), `{user}` (member ID) and `{group}` (group ID). Empty means no notice |
 | `group_leaves` | `template_list` | `[]` | Per-group leave notice cards, each with group ID and message; groups without a card use the global message |
 | `global_welcome` | `text` | `Welcome {at}!` | Global default welcome message, used when a group has no per-group config. Placeholders supported |
 | `global_image` | `string` | `""` | Global default welcome image (URL or local path). Empty means no image |

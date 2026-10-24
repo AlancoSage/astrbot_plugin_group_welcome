@@ -118,7 +118,8 @@ class GroupWelcomePlugin(Star):
             if not self.config.get("enabled", True):
                 return
 
-        chain = self._build_chain(welcome, event, new_user_id)
+        member_name = await self._fetch_member_name(event, group_id, new_user_id)
+        chain = self._build_chain(welcome, event, new_user_id, member_name)
         if image:
             chain.append(Comp.Image(file=image))
         try:
@@ -146,8 +147,10 @@ class GroupWelcomePlugin(Star):
         if not leave_text:
             return
 
-        text = leave_text.replace("{user}", leave_user_id).replace(
-            "{group}", group_id
+        text = (
+            leave_text.replace("{user}", leave_user_id)
+            .replace("{group}", group_id)
+            .replace("{name}", await self._fetch_member_name(event, group_id, leave_user_id))
         )
         try:
             await event.send(event.plain_result(text))
@@ -170,9 +173,13 @@ class GroupWelcomePlugin(Star):
         return True
 
     def _build_chain(
-        self, welcome: str, event: AstrMessageEvent, new_user_id: str
+        self,
+        welcome: str,
+        event: AstrMessageEvent,
+        new_user_id: str,
+        member_name: str = "",
     ) -> list:
-        """把欢迎语文本解析为消息链，支持 {at}、{name}、{group} 占位符
+        """把欢迎语文本解析为消息链，支持 {at}、{name}、{user}、{group} 占位符
 
         欢迎语可包含多行，多条用换行分隔，发送时随机抽取一条。
         """
@@ -182,24 +189,50 @@ class GroupWelcomePlugin(Star):
 
         parts = welcome.split("{at}")
         chain: list = []
-        sender_name = "新朋友"
-        try:
-            sender_name = event.message_obj.sender.nickname or sender_name
-        except Exception:
-            pass
+        sender_name = member_name or "新朋友"
+        if not member_name:
+            try:
+                sender_name = event.message_obj.sender.nickname or sender_name
+            except Exception:
+                pass
 
         for i, part in enumerate(parts):
             if part:
                 chain.append(
                     Comp.Plain(
-                        text=part.replace("{name}", sender_name).replace(
-                            "{group}", str(event.message_obj.group_id)
-                        )
+                        text=part.replace("{name}", sender_name)
+                        .replace("{user}", new_user_id)
+                        .replace("{group}", str(event.message_obj.group_id))
                     )
                 )
             if i < len(parts) - 1:
                 chain.append(Comp.At(qq=new_user_id))
         return chain
+
+    async def _fetch_member_name(
+        self, event: AstrMessageEvent, group_id: str, user_id: str
+    ) -> str:
+        """通过机器人 API 获取成员群昵称/昵称，失败时返回空字符串"""
+        bot = getattr(event, "bot", None)
+        if not bot or not user_id:
+            return ""
+        try:
+            info = await bot.call_action(
+                action="get_group_member_info",
+                group_id=int(group_id),
+                user_id=int(user_id),
+                no_cache=False,
+            )
+            name = (info or {}).get("card") or (info or {}).get("nickname") or ""
+            if not name:
+                info = await bot.call_action(
+                    action="get_stranger_info", user_id=int(user_id), no_cache=False
+                )
+                name = (info or {}).get("nick") or (info or {}).get("nickname") or ""
+            return str(name)
+        except Exception as e:
+            logger.debug(f"获取成员昵称失败: {e}")
+            return ""
 
     # ---------- 管理指令 ----------
     # 单独注册指令（不使用 command_group），管理员校验在各指令函数内部进行。
