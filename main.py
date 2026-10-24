@@ -59,6 +59,18 @@ class GroupWelcomePlugin(Star):
         ]
         self.config.save_config()
 
+    def _parse_group_leaves(self) -> dict[str, str]:
+        """把配置中的 group_leaves 条目解析为 {群号: 退群提示语}"""
+        result: dict[str, str] = {}
+        for item in self.config.get("group_leaves") or []:
+            if not isinstance(item, dict):
+                continue
+            group_id = str(item.get("group_id", "")).strip()
+            text = str(item.get("leave", "")).strip()
+            if group_id and text:
+                result[group_id] = text
+        return result
+
     # ---------- 入群检测与欢迎 ----------
 
     @filter.event_message_type(filter.EventMessageType.GROUP_MESSAGE, priority=5)
@@ -127,7 +139,10 @@ class GroupWelcomePlugin(Star):
         leave_user_id = str(raw.get("user_id", ""))
         logger.info(f"检测到成员退群: 群 {group_id}, 用户 {leave_user_id}")
 
-        leave_text = str(self.config.get("global_leave", "{user} 退出了本群")).strip()
+        leave_text = (
+            self._parse_group_leaves().get(group_id)
+            or self.config.get("global_leave", "{user} 退出了本群")
+        ).strip()
         if not leave_text:
             return
 

@@ -14,7 +14,7 @@ Automatically sends a welcome message when a new member joins a group. Supports 
   - `{name}`: nickname of the new member
   - `{group}`: group ID
 - Group allowlist/denylist filtering, coexisting: the denylist is always effective (listed groups are skipped); when the allowlist is non-empty, only listed groups are welcomed (denylist takes precedence).
-- Leave notice: automatically sends a message when a member leaves the group, with an independent toggle and customizable message (placeholders `{user}`, `{group}`); no notice when the bot itself is kicked (`kick_me`).
+- Leave notice: automatically sends a message when a member leaves the group, with an independent toggle and customizable message (placeholders `{user}`, `{group}`); per-group messages are supported; no notice when the bot itself is kicked (`kick_me`).
 - Admin commands: set/view/delete the current group's welcome text and image directly in group chat; synced with the WebUI config.
 - Delayed welcome: a global default delay in seconds, customizable per group.
 - Random welcome messages: write multiple lines in the welcome text, separated by line breaks; one line is picked at random on each join.
@@ -41,6 +41,7 @@ The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to
 | `enabled` | `bool` | `true` | Enable the welcome feature |
 | `leave_enabled` | `bool` | `true` | Enable the leave notice |
 | `global_leave` | `text` | `{user} 退出了本群` | Global leave notice message, placeholders `{user}` (leaving member ID) and `{group}` (group ID). Empty means no notice |
+| `group_leaves` | `template_list` | `[]` | Per-group leave notice cards, each with group ID and message; groups without a card use the global message |
 | `global_welcome` | `text` | `Welcome {at}!` | Global default welcome message, used when a group has no per-group config. Placeholders supported |
 | `global_image` | `string` | `""` | Global default welcome image (URL or local path). Empty means no image |
 | `list_mode` | `string` | `blacklist` | Deprecated; lists now coexist, no need to configure |
@@ -57,6 +58,13 @@ The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to
 | `welcome` | `text` | Welcome message for this group. Placeholders supported. Multiple lines are picked at random. Falls back to the global message when empty |
 | `image` | `string` | Welcome image for this group (URL or local path). Falls back to the global image when empty |
 | `delay` | `int` | Delay in seconds before sending for this group. 0 or empty falls back to the global delay |
+
+### `group_leaves` entry fields
+
+| Field | Type | Description |
+|---|---|---|
+| `group_id` | `string` | Group ID to customize |
+| `leave` | `text` | Leave notice message for this group, supports `{user}` and `{group}`. Falls back to the global message when empty |
 
 Example (equivalent to adding one card in the WebUI):
 

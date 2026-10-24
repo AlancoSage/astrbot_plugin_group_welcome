@@ -62,6 +62,29 @@
       }
     }
   },
+  "group_leaves": {
+    "description": "每群单独退群提示语，点击添加条目为每个群配置。设置后优先于全局退群提示语",
+    "type": "template_list",
+    "default": [],
+    "templates": {
+      "group_leave": {
+        "name": "群退群提示",
+        "hint": "为指定群单独配置退群提示语",
+        "items": {
+          "group_id": {
+            "description": "群号",
+            "type": "string",
+            "hint": "要单独设置退群提示的群号"
+          },
+          "leave": {
+            "description": "退群提示语",
+            "type": "text",
+            "hint": "支持占位符：{user} 退群成员QQ号，{group} 群号。留空时使用全局默认退群提示语"
+          }
+        }
+      }
+    }
+  },
   "blacklist": {
     "description": "群黑名单，填群号。黑名单始终生效且优先级最高，命中的群不发送欢迎",
     "type": "list",
