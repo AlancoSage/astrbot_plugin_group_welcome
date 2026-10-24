@@ -54,16 +54,18 @@
       "Microsoft YaHei", "Noto Sans SC", sans-serif;
     font-size: 14px;
     line-height: 1.65;
+    overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
-  .shell { max-width: 980px; margin: 0 auto; padding: 22px 20px 90px; }
+  .shell { max-width: 980px; margin: 0 auto; padding: 0 20px 96px; }
 
-  /* ---------- 顶部栏 ---------- */
+  /* ---------- 顶部栏（全宽吸顶） ---------- */
   .appbar {
     position: sticky; top: 0; z-index: 20;
-    margin: 0 -20px 22px; padding: 14px 20px;
     display: flex; align-items: center; gap: 14px;
-    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    margin: 0 calc(50% - 50vw) 22px;
+    padding: 12px max(20px, calc((100vw - 980px) / 2 + 20px));
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
     backdrop-filter: blur(14px);
     border-bottom: 1px solid var(--border);
   }
