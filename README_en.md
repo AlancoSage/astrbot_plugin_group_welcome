@@ -14,6 +14,7 @@ Automatically sends a welcome message when a new member joins a group. Supports 
   - `{name}`: member nickname (fetched through the bot API, group card first; works in leave notices too)
   - `{user}`: member QQ ID
   - `{group}`: group ID
+- Plugin management page: open the "Group Welcome" page from the plugin card in the WebUI to edit global settings, allow/deny lists, and per-group config visually; changes take effect immediately.
 - Group allowlist/denylist filtering, coexisting: the denylist is always effective (listed groups are skipped); when the allowlist is non-empty, only listed groups are welcomed (denylist takes precedence).
 - Leave notice: automatically sends a message when a member leaves the group, with an independent toggle and customizable message (placeholders `{name}`, `{user}`, `{group}`); per-group messages are supported; no notice when the bot itself is kicked (`kick_me`).
 - Admin commands: set/view/delete the current group's welcome text and image directly in group chat; synced with the WebUI config.
@@ -29,11 +30,11 @@ The plugin only triggers on OneBot v11 `notice` events with `notice_type` set to
 ## Quick start
 
 1. Install the plugin into AstrBot's plugin directory and reload (or upload the zip in the WebUI).
-2. Configure as needed in the plugin settings:
+2. Open the "Group Welcome" page from the plugin card in the WebUI, or configure the plugin settings directly:
    - `global_welcome`: global default welcome message
    - `global_image`: global default welcome image (optional)
-3. To restrict where it applies, configure `list_mode` + `blacklist` / `whitelist`.
-4. To customize a specific group, click "Add entry" under the per-group list and fill in the group ID, welcome message, and image.
+3. To restrict where it applies, configure `blacklist` / `whitelist`.
+4. To customize a specific group, click "添加群" (add group) in the per-group section of the management page and fill in the group ID, message, image, and delay.
 
 ## Configuration
 

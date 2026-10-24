@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>入群欢迎</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1f2328;
+    --muted: #6b7280;
+    --border: #e3e6ea;
+    --primary: #5b6ef5;
+    --primary-soft: rgba(91, 110, 245, 0.12);
+    --danger: #e5484d;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.05);
+    --radius: 12px;
+  }
+  [data-theme="dark"] {
+    --bg: #16181d;
+    --card: #1f2229;
+    --text: #e6e8eb;
+    --muted: #9aa1ab;
+    --border: #2f333c;
+    --primary: #7c8cff;
+    --primary-soft: rgba(124, 140, 255, 0.16);
+    --danger: #ff6369;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 20px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+      "Microsoft YaHei", sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 920px; margin: 0 auto; }
+  .page-head {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 16px; margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .page-head h1 { margin: 0; font-size: 20px; font-weight: 600; }
+  .page-head p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow);
+    padding: 16px 18px; margin-bottom: 14px;
+  }
+  .card > h2 {
+    margin: 0 0 4px; font-size: 15px; font-weight: 600;
+  }
+  .card > .sub { margin: 0 0 12px; color: var(--muted); font-size: 12.5px; }
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 8px 0;
+  }
+  .row + .row { border-top: 1px dashed var(--border); }
+  .row .label { font-size: 13.5px; }
+  .row .hint { color: var(--muted); font-size: 12px; margin-top: 2px; }
+  .field { margin-top: 12px; }
+  .field > label {
+    display: block; font-size: 13px; font-weight: 500; margin-bottom: 6px;
+  }
+  .field .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  input[type="text"], input[type="number"], textarea, select {
+    width: 100%; padding: 8px 10px; font: inherit; color: var(--text);
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 8px; outline: none;
+  }
+  input:focus, textarea:focus, select:focus {
+    border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+  textarea { min-height: 76px; resize: vertical; }
+  .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex: none; }
+  .switch input { opacity: 0; width: 0; height: 0; }
+  .slider {
+    position: absolute; inset: 0; cursor: pointer; border-radius: 999px;
+    background: var(--border); transition: background 0.15s;
+  }
+  .slider::before {
+    content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px;
+    background: #fff; border-radius: 50%; transition: transform 0.15s;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  .switch input:checked + .slider { background: var(--primary); }
+  .switch input:checked + .slider::before { transform: translateX(18px); }
+  button {
+    font: inherit; cursor: pointer; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); color: var(--text); padding: 7px 14px;
+  }
+  button:hover { border-color: var(--primary); color: var(--primary); }
+  button.primary {
+    background: var(--primary); border-color: var(--primary); color: #fff;
+  }
+  button.primary:hover { filter: brightness(1.06); color: #fff; }
+  button.ghost-danger { color: var(--danger); border-color: transparent; background: transparent; }
+  button.ghost-danger:hover { background: rgba(229, 72, 77, 0.1); }
+  .group-item {
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; margin-top: 10px; background: var(--bg);
+  }
+  .group-item .head {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+    margin-bottom: 8px;
+  }
+  .group-item .head strong { font-size: 13.5px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+  .toolbar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .empty {
+    padding: 18px; text-align: center; color: var(--muted);
+    border: 1px dashed var(--border); border-radius: 10px; margin-top: 10px;
+    font-size: 13px;
+  }
+  .save-bar {
+    position: sticky; bottom: 0; display: flex; justify-content: flex-end; gap: 10px;
+    padding: 12px 0; background: linear-gradient(transparent, var(--bg) 40%);
+  }
+  .toast {
+    position: fixed; right: 20px; bottom: 20px; padding: 10px 16px;
+    border-radius: 10px; background: #2f8f4e; color: #fff; font-size: 13px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18); opacity: 0; pointer-events: none;
+    transform: translateY(8px); transition: all 0.2s;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.error { background: #d33a3f; }
+  .tag {
+    display: inline-block; padding: 1px 8px; border-radius: 999px;
+    background: var(--primary-soft); color: var(--primary); font-size: 11.5px;
+    margin-left: 8px; vertical-align: middle;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="page-head">
+    <div>
+      <h1>入群欢迎 <span class="tag">astrbot_plugin_group_welcome</span></h1>
+      <p>配置入群欢迎、退群提示与群黑白名单，保存后立即生效。</p>
+    </div>
+    <div class="toolbar">
+      <button id="reload">重新加载</button>
+      <button class="primary" id="save">保存配置</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>开关</h2>
+    <p class="sub">分别控制入群欢迎与退群提示。</p>
+    <div class="row">
+      <div>
+        <div class="label">启用入群欢迎</div>
+        <div class="hint">关闭后不再发送任何入群欢迎消息</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="enabled" />
+        <span class="slider"></span>
+      </label>
+    </div>
+    <div class="row">
+      <div>
+        <div class="label">启用退群提示</div>
+        <div class="hint">关闭后不再发送退群提示</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="leave_enabled" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>全局配置</h2>
+    <p class="sub">某个群没有单独配置时使用这里的设置。</p>
+    <div class="field">
+      <label for="global_welcome">默认欢迎语</label>
+      <textarea id="global_welcome" placeholder="欢迎 {at} 加入本群！"></textarea>
+      <div class="hint">
+        占位符：{at} AT新人，{name} 成员昵称，{user} 成员QQ号，{group} 群号。可写多行，多条随机抽取。
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="field">
+        <label for="global_image">默认欢迎图片</label>
+        <input type="text" id="global_image" placeholder="图片 URL 或本地路径，留空不发图" />
+      </div>
+      <div class="field">
+        <label for="welcome_delay_sec">默认延迟（秒）</label>
+        <input type="number" id="welcome_delay_sec" min="0" step="1" placeholder="0" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="global_leave">默认退群提示语</label>
+      <textarea id="global_leave" placeholder="{name}（{user}）退出了本群"></textarea>
+      <div class="hint">占位符：{name} 成员昵称，{user} 成员QQ号，{group} 群号。留空不发送。</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>群黑白名单</h2>
+    <p class="sub">
+      黑名单始终生效且优先级最高；白名单非空时仅白名单中的群生效，留空表示不限制。
+    </p>
+    <div class="grid2">
+      <div class="field">
+        <label for="blacklist">黑名单群号</label>
+        <textarea id="blacklist" placeholder="每行一个群号"></textarea>
+      </div>
+      <div class="field">
+        <label for="whitelist">白名单群号</label>
+        <textarea id="whitelist" placeholder="每行一个群号"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="page-head" style="margin-bottom: 6px">
+      <div>
+        <h2>每群欢迎语</h2>
+        <p class="sub">为指定群单独配置欢迎语、图片和延迟，优先于全局配置。</p>
+      </div>
+      <button id="add-welcome">+ 添加群</button>
+    </div>
+    <div id="welcome-list"></div>
+  </div>
+
+  <div class="card">
+    <div class="page-head" style="margin-bottom: 6px">
+      <div>
+        <h2>每群退群提示</h2>
+        <p class="sub">为指定群单独配置退群提示语，优先于全局配置。</p>
+      </div>
+      <button id="add-leave">+ 添加群</button>
+    </div>
+    <div id="leave-list"></div>
+  </div>
+
+  <div class="save-bar">
+    <button id="save-bottom" class="primary">保存配置</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+  const bridge = window.AstrBotPluginPage;
+  const $ = (id) => document.getElementById(id);
+  let state = {
+    enabled: true,
+    leave_enabled: true,
+    global_welcome: "",
+    global_image: "",
+    global_leave: "",
+    welcome_delay_sec: 0,
+    blacklist: [],
+    whitelist: [],
+    group_welcomes: [],
+    group_leaves: [],
+  };
+
+  function toast(message, isError) {
+    const el = $("toast");
+    el.textContent = message;
+    el.className = "toast show" + (isError ? " error" : "");
+    clearTimeout(el._timer);
+    el._timer = setTimeout(() => { el.className = "toast"; }, 2200);
+  }
+
+  function linesToArray(text) {
+    return text.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+
+  function renderWelcomeList() {
+    const box = $("welcome-list");
+    if (!state.group_welcomes.length) {
+      box.innerHTML = '<div class="empty">暂无单独配置的群，入群时使用全局配置。</div>';
+      return;
+    }
+    box.innerHTML = state.group_welcomes.map((row, index) => `
+      <div class="group-item" data-index="${index}">
+        <div class="head">
+          <strong>群 ${escapeHtml(row.group_id || "未填写")}</strong>
+          <button class="ghost-danger" data-remove-welcome="${index}">删除</button>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>群号</label>
+            <input type="text" data-field="group_id" value="${escapeHtml(row.group_id)}" placeholder="群号" />
+          </div>
+          <div class="field">
+            <label>延迟（秒，留空用全局）</label>
+            <input type="text" data-field="delay" value="${escapeHtml(row.delay)}" placeholder="留空" />
+          </div>
+        </div>
+        <div class="field">
+          <label>欢迎语</label>
+          <textarea data-field="welcome" placeholder="欢迎 {at} 加入本群！">${escapeHtml(row.welcome)}</textarea>
+        </div>
+        <div class="field">
+          <label>欢迎图片（可选）</label>
+          <input type="text" data-field="image" value="${escapeHtml(row.image)}" placeholder="图片 URL 或本地路径" />
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function renderLeaveList() {
+    const box = $("leave-list");
+    if (!state.group_leaves.length) {
+      box.innerHTML = '<div class="empty">暂无单独配置的群，退群时使用全局提示语。</div>';
+      return;
+    }
+    box.innerHTML = state.group_leaves.map((row, index) => `
+      <div class="group-item" data-index="${index}">
+        <div class="head">
+          <strong>群 ${escapeHtml(row.group_id || "未填写")}</strong>
+          <button class="ghost-danger" data-remove-leave="${index}">删除</button>
+        </div>
+        <div class="field">
+          <label>群号</label>
+          <input type="text" data-field="group_id" value="${escapeHtml(row.group_id)}" placeholder="群号" />
+        </div>
+        <div class="field">
+          <label>退群提示语</label>
+          <textarea data-field="leave" placeholder="{name}（{user}）退出了本群">${escapeHtml(row.leave)}</textarea>
+        </div>
+      </div>
+    `).join("");
+  }
+
+  function render() {
+    $("enabled").checked = !!state.enabled;
+    $("leave_enabled").checked = !!state.leave_enabled;
+    $("global_welcome").value = state.global_welcome || "";
+    $("global_image").value = state.global_image || "";
+    $("global_leave").value = state.global_leave || "";
+    $("welcome_delay_sec").value = state.welcome_delay_sec ?? 0;
+    $("blacklist").value = (state.blacklist || []).join("\n");
+    $("whitelist").value = (state.whitelist || []).join("\n");
+    renderWelcomeList();
+    renderLeaveList();
+  }
+
+  function syncFormToState() {
+    state.enabled = $("enabled").checked;
+    state.leave_enabled = $("leave_enabled").checked;
+    state.global_welcome = $("global_welcome").value;
+    state.global_image = $("global_image").value.trim();
+    state.global_leave = $("global_leave").value;
+    state.welcome_delay_sec = parseInt($("welcome_delay_sec").value || "0", 10) || 0;
+    state.blacklist = linesToArray($("blacklist").value);
+    state.whitelist = linesToArray($("whitelist").value);
+  }
+
+  async function load() {
+    if (!bridge) {
+      toast("请从 AstrBot 插件页打开本页面", true);
+      return;
+    }
+    try {
+      const data = await bridge.apiGet("/welcome/config");
+      state = Object.assign(state, data || {});
+      render();
+    } catch (error) {
+      toast("读取配置失败：" + error.message, true);
+    }
+  }
+
+  async function save() {
+    syncFormToState();
+    try {
+      const data = await bridge.apiPost("/welcome/config", state);
+      state = Object.assign(state, data || {});
+      render();
+      toast("配置已保存");
+    } catch (error) {
+      toast("保存失败：" + error.message, true);
+    }
+  }
+
+  document.addEventListener("input", (event) => {
+    const item = event.target.closest(".group-item");
+    if (!item) return;
+    const isWelcome = !!item.closest("#welcome-list");
+    const list = isWelcome ? state.group_welcomes : state.group_leaves;
+    const row = list[Number(item.dataset.index)];
+    const field = event.target.dataset.field;
+    if (!row || !field) return;
+    row[field] = event.target.value;
+  });
+
+  document.addEventListener("click", (event) => {
+    const removeWelcome = event.target.dataset.removeWelcome;
+    const removeLeave = event.target.dataset.removeLeave;
+    if (removeWelcome !== undefined) {
+      state.group_welcomes.splice(Number(removeWelcome), 1);
+      renderWelcomeList();
+    }
+    if (removeLeave !== undefined) {
+      state.group_leaves.splice(Number(removeLeave), 1);
+      renderLeaveList();
+    }
+  });
+
+  $("add-welcome").addEventListener("click", () => {
+    syncFormToState();
+    state.group_welcomes.push({ group_id: "", welcome: "", image: "", delay: "", leave: "" });
+    renderWelcomeList();
+  });
+
+  $("add-leave").addEventListener("click", () => {
+    syncFormToState();
+    state.group_leaves.push({ group_id: "", welcome: "", image: "", delay: "", leave: "" });
+    renderLeaveList();
+  });
+
+  $("save").addEventListener("click", save);
+  $("save-bottom").addEventListener("click", save);
+  $("reload").addEventListener("click", load);
+
+  if (bridge) {
+    bridge.ready().then(load);
+  } else {
+    render();
+  }
+</script>
+</body>
+</html>

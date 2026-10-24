@@ -1,0 +1,11 @@
+{
+  "metadata": {
+    "display_name": "Group Welcome",
+    "desc": "Group welcome plugin with per-group welcome messages and images, plus group allow/deny lists."
+  },
+  "pages": {
+    "welcome": {
+      "title": "Group Welcome"
+    }
+  }
+}

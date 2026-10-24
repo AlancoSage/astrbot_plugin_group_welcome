@@ -7,12 +7,169 @@ import astrbot.api.message_components as Comp
 from astrbot.api import AstrBotConfig, logger
 from astrbot.api.event import AstrMessageEvent, filter
 from astrbot.api.star import Context, Star
+from astrbot.api.web import error_response, json_response, request
+
+# 插件页可编辑的配置项
+EDITABLE_KEYS = {
+    "enabled",
+    "leave_enabled",
+    "global_welcome",
+    "global_image",
+    "global_leave",
+    "welcome_delay_sec",
+    "blacklist",
+    "whitelist",
+    "group_welcomes",
+    "group_leaves",
+}
+
+# 插件页 Web API 路由需要以插件名开头（面板会以 /api/v1/plugins/extensions/<插件名>/... 转发）
+PLUGIN_NAME = "astrbot_plugin_group_welcome"
+API_CONFIG_ROUTE = f"/{PLUGIN_NAME}/welcome/config"
 
 
 class GroupWelcomePlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
         self.config = config
+        context.register_web_api(
+            API_CONFIG_ROUTE,
+            self.api_get_config,
+            ["GET"],
+            "获取入群欢迎插件配置",
+        )
+        context.register_web_api(
+            API_CONFIG_ROUTE,
+            self.api_post_config,
+            ["POST"],
+            "保存入群欢迎插件配置",
+        )
+
+    # ---------- 插件页 Web API ----------
+
+    def _public_config(self) -> dict:
+        """返回给插件页的配置快照（已做类型规整）"""
+        def _str_list(value) -> list[str]:
+            return [str(item) for item in (value or []) if str(item).strip()]
+
+        def _group_rows(value) -> list[dict]:
+            rows = []
+            for item in value or []:
+                if not isinstance(item, dict):
+                    continue
+                rows.append(
+                    {
+                        "group_id": str(item.get("group_id", "")),
+                        "welcome": str(item.get("welcome", "")),
+                        "image": str(item.get("image", "")),
+                        "delay": str(item.get("delay", "")),
+                        "leave": str(item.get("leave", "")),
+                    }
+                )
+            return rows
+
+        try:
+            delay = int(self.config.get("welcome_delay_sec", 0) or 0)
+        except (TypeError, ValueError):
+            delay = 0
+
+        return {
+            "enabled": bool(self.config.get("enabled", True)),
+            "leave_enabled": bool(self.config.get("leave_enabled", True)),
+            "global_welcome": str(self.config.get("global_welcome", "")),
+            "global_image": str(self.config.get("global_image", "")),
+            "global_leave": str(self.config.get("global_leave", "")),
+            "welcome_delay_sec": max(delay, 0),
+            "blacklist": _str_list(self.config.get("blacklist")),
+            "whitelist": _str_list(self.config.get("whitelist")),
+            "group_welcomes": _group_rows(self.config.get("group_welcomes")),
+            "group_leaves": _group_rows(self.config.get("group_leaves")),
+        }
+
+    async def api_get_config(self):
+        """GET /welcome/config：读取配置"""
+        return json_response({"status": "ok", "data": self._public_config()})
+
+    async def api_post_config(self):
+        """POST /welcome/config：保存配置"""
+        data = await request.json(default=None)
+        if not isinstance(data, dict):
+            return error_response("请求体格式错误")
+
+        updated: dict = {}
+
+        for key in ("enabled", "leave_enabled"):
+            if key in data:
+                updated[key] = bool(data[key])
+
+        for key in ("global_welcome", "global_image", "global_leave"):
+            if key in data:
+                updated[key] = str(data[key] or "")
+
+        if "welcome_delay_sec" in data:
+            try:
+                updated["welcome_delay_sec"] = max(int(data["welcome_delay_sec"] or 0), 0)
+            except (TypeError, ValueError):
+                return error_response("延迟秒数必须是整数")
+
+        for key in ("blacklist", "whitelist"):
+            if key in data:
+                if not isinstance(data[key], list):
+                    return error_response(f"{key} 必须是列表")
+                updated[key] = [
+                    str(item).strip() for item in data[key] if str(item).strip()
+                ]
+
+        if "group_welcomes" in data:
+            rows = data["group_welcomes"]
+            if not isinstance(rows, list):
+                return error_response("group_welcomes 必须是列表")
+            entries = []
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                group_id = str(row.get("group_id", "")).strip()
+                if not group_id:
+                    continue
+                entries.append(
+                    {
+                        "__template_key": "group_welcome",
+                        "group_id": group_id,
+                        "welcome": str(row.get("welcome", "") or ""),
+                        "image": str(row.get("image", "") or ""),
+                        "delay": str(row.get("delay", "") or ""),
+                    }
+                )
+            updated["group_welcomes"] = entries
+
+        if "group_leaves" in data:
+            rows = data["group_leaves"]
+            if not isinstance(rows, list):
+                return error_response("group_leaves 必须是列表")
+            entries = []
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                group_id = str(row.get("group_id", "")).strip()
+                if not group_id:
+                    continue
+                entries.append(
+                    {
+                        "__template_key": "group_leave",
+                        "group_id": group_id,
+                        "leave": str(row.get("leave", "") or ""),
+                    }
+                )
+            updated["group_leaves"] = entries
+
+        try:
+            self.config.update(updated)
+            self.config.save_config()
+        except Exception as e:
+            logger.error(f"保存插件配置失败: {e}")
+            return error_response("保存配置失败，请查看日志")
+
+        return json_response({"status": "ok", "data": self._public_config()})
 
     # ---------- 配置读写 ----------
 
